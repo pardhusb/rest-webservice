@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="58a1527f-6132-4fe6-821e-f52d23b5db93" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="14f9879c-83ae-4924-91ae-1aeccfce400a" basePath="/api/v1" >
+		<http:request-connection host="dummy.restapiexample.com" port="80" />
+	</http:request-config>
+	<flow name="rest-webserviceFlow" doc:id="1d5cb332-7f55-4393-8d31-ae103d64ddeb" >
+		<http:listener doc:name="Listener" doc:id="4a3d0e96-37f6-430c-845f-9a687f313b5c" config-ref="HTTP_Listener_config" path="/rest"/>
+		<http:request method="GET" doc:name="Request" doc:id="1c95d3db-ff07-413c-b1b4-4a2f29e07412" config-ref="HTTP_Request_configuration" path="/employees"/>
+		<ee:transform doc:name="Transform Message" doc:id="487635b9-b8eb-48cb-b838-c16ca552c10e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload.data map (item, index) -> {
+    id : item.id,
+    name : item.employee_name,
+    age : item.employee_age
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
